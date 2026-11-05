@@ -2,7 +2,7 @@
 (function () {
   const D = window.DATA, L = window.LLM, SH = window.SH;
   const $ = (s, r = document) => r.querySelector(s);
-  const DEMO_URL = 'https://shanhaipufa-demo.app.workbuddy.host/?sharecode=YWLJVTPCL5';
+  const DEMO_URL = 'https://c8219.github.io/shanhaipufa-demo/';
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
