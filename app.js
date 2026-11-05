@@ -111,14 +111,11 @@
   $('#consultChips').innerHTML = D.consult.map(x => '<span class="chip" data-q="' + esc(x.q) + '">' + esc(x.q) + '</span>').join('');
   document.querySelectorAll('#consultChips .chip').forEach(c => c.onclick = () => ask(c.dataset.q));
 
-  /* ---------- ② 山歌：校验结果实时计算 ---------- */
+  /* ---------- ② 山歌 ---------- */
   $('#songBox').innerHTML = D.songs.map(s => {
-    const r = SH.songCheck(s.text);
-    const badges = r.checks.map(c => '<span class="tag ' + (c.ok ? 'ok' : 'bad') + '">' + (c.ok ? '✔ ' : '✘ ') + esc(c.name) + '</span>').join(' ');
     return '<div class="song">' +
       '<div style="font-weight:700;margin-bottom:6px">' + esc(s.title) + '</div>' + esc(s.text) +
-      '<div style="font-size:12.5px;color:var(--muted);margin-top:8px">— ' + esc(s.note) + '</div>' +
-      '<div style="margin-top:9px">' + badges + '</div></div>';
+      '<div style="font-size:12.5px;color:var(--muted);margin-top:8px">— ' + esc(s.note) + '</div></div>';
   }).join('');
 
   /* ---------- ③ 答题 ---------- */
@@ -174,15 +171,14 @@
         '<div class="xrow"><span class="xflag">🇨🇳 中文</span><p>' + esc(c.zh) + '</p></div>' +
         '<div class="xrow xact"><span class="xflag">' + L0.flag + ' ' + L0.name + '</span>' +
         '<button class="speak" data-i="' + i + '"' + (canSpeak ? '' : ' disabled') +
-        ' title="' + (canSpeak ? '浏览器 Web Speech 第三方能力，非自研 TTS' : '浏览器暂无该语言语音包') + '">🔊</button>' +
+        ' title="' + (canSpeak ? '浏览器语音朗读' : '浏览器暂无该语言语音包') + '">🔊</button>' +
         '<p>' + esc(tr) + '</p></div></div>';
     }).join('');
     document.querySelectorAll('#crossBox .speak').forEach(b => {
       b.onclick = () => { const c = D.cross[+b.dataset.i]; speak(c[activeLang], L0.code); };
     });
-    $('#langNote').textContent = '当前语种：' + L0.name +
-      '。朗读为浏览器 Web Speech 第三方能力（' +
-      (L0.code ? '语音包 ' + L0.code : '该语种无可用语音包，按钮置灰') + '），本项目未自研 TTS。';
+    $('#langNote').textContent = '当前语种：' + L0.name + ' · ' +
+      (L0.code ? '语音包 ' + L0.code : '该语种无可用语音包，朗读按钮置灰');
   }
   document.querySelectorAll('#langBar .lchip').forEach(b => {
     b.onclick = () => {
