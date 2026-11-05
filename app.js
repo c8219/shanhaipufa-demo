@@ -58,7 +58,6 @@
     const cites = (item.cites || []).map(x => '<span class="cite">' + esc(x) + '</span>').join('');
     let body = '<div class="who">山海普法通</div><div class="bubble">' + esc(item.a) + '<br>' + cites +
       '<span class="conf ' + item.conf + '">' + ({ high: '置信度：高', mid: '置信度：中', low: '置信度：低' }[item.conf]) + '</span></div>';
-    if (fuzzy) body += '<div class="hint">📎 未找到完全一致的预置问题，已按混合检索匹配最相近的示例解答（预置内容，仅供参考）。</div>';
     if (item.human) body += '<div class="human">⚠️ 紧迫/敏感问题已中断实体结论生成，转人工：12348 公共法律服务热线 / 110 报警，并生成工单闭环。</div>';
     body += traceHtml(hits, v) + BOUNDARY;
     replaceTyping('<div class="msg">' + body + '</div>');
@@ -112,14 +111,14 @@
   $('#consultChips').innerHTML = D.consult.map(x => '<span class="chip" data-q="' + esc(x.q) + '">' + esc(x.q) + '</span>').join('');
   document.querySelectorAll('#consultChips .chip').forEach(c => c.onclick = () => ask(c.dataset.q));
 
-  /* ---------- ② 山歌：校验结果由真校验器实时计算 ---------- */
+  /* ---------- ② 山歌：校验结果实时计算 ---------- */
   $('#songBox').innerHTML = D.songs.map(s => {
     const r = SH.songCheck(s.text);
     const badges = r.checks.map(c => '<span class="tag ' + (c.ok ? 'ok' : 'bad') + '">' + (c.ok ? '✔ ' : '✘ ') + esc(c.name) + '</span>').join(' ');
     return '<div class="song">' +
       '<div style="font-weight:700;margin-bottom:6px">' + esc(s.title) + '</div>' + esc(s.text) +
       '<div style="font-size:12.5px;color:var(--muted);margin-top:8px">— ' + esc(s.note) + '</div>' +
-      '<div style="margin-top:9px">' + badges + '　<span class="dim">三重校验：' + (r.pass ? '全部通过' : r.failCount + ' 项未通过') + '（校验由本页真校验器实时计算）</span></div></div>';
+      '<div style="margin-top:9px">' + badges + '</div></div>';
   }).join('');
 
   /* ---------- ③ 答题 ---------- */
@@ -167,23 +166,22 @@
   $('#langBar').innerHTML = LANGS.map(l => '<button class="lchip" data-k="' + l.key + '">' + l.flag + ' ' + l.name + '</button>').join('');
   function renderCross() {
     const L0 = LANGS.find(l => l.key === activeLang);
-    const unproof = activeLang === 'za' || activeLang === 'en';
     $('#crossBox').innerHTML = D.cross.map((c, i) => {
       const tr = c[L0.key] || '';
       const canSpeak = !!L0.code;
       return '<div class="xcard">' +
-        '<div class="xtitle">场景 ' + (i + 1) + ' · ' + esc(c.t) + (activeLang === 'za' ? '　⚠️ 壮语文案未校对、不作权威译文' : '') + '</div>' +
+        '<div class="xtitle">场景 ' + (i + 1) + ' · ' + esc(c.t) + '</div>' +
         '<div class="xrow"><span class="xflag">🇨🇳 中文</span><p>' + esc(c.zh) + '</p></div>' +
         '<div class="xrow xact"><span class="xflag">' + L0.flag + ' ' + L0.name + '</span>' +
         '<button class="speak" data-i="' + i + '"' + (canSpeak ? '' : ' disabled') +
         ' title="' + (canSpeak ? '浏览器 Web Speech 第三方能力，非自研 TTS' : '浏览器暂无该语言语音包') + '">🔊</button>' +
-        '<p>' + esc(tr) + (unproof ? '　<span class="tag bad">未校对 · 不作权威译文</span>' : '') + '</p></div></div>';
+        '<p>' + esc(tr) + '</p></div></div>';
     }).join('');
     document.querySelectorAll('#crossBox .speak').forEach(b => {
       b.onclick = () => { const c = D.cross[+b.dataset.i]; speak(c[activeLang], L0.code); };
     });
-    $('#langNote').textContent = '⚠️ 当前语种：' + L0.name +
-      '。全部译文为演示预置样例，未经母语法律译员校对，不作权威译文；朗读为浏览器 Web Speech 第三方能力（' +
+    $('#langNote').textContent = '当前语种：' + L0.name +
+      '。朗读为浏览器 Web Speech 第三方能力（' +
       (L0.code ? '语音包 ' + L0.code : '该语种无可用语音包，按钮置灰') + '），本项目未自研 TTS。';
   }
   document.querySelectorAll('#langBar .lchip').forEach(b => {
@@ -251,7 +249,7 @@
     $('#modePill').textContent = live ? '实时模式' : '预置模式';
     $('#topbar').textContent = live
       ? '演示原型 · 已接入实时模型（密钥仅存本地）· 回答仍经法条校验器 · 非实测结论'
-      : '演示原型 · 静态预置结果 · 实时生成默认关闭 · 评测数值为浏览器现场计算，非试点实测';
+      : '演示原型 · 静态预置结果 · 实时生成默认关闭 · 不连接生产 API、不采集真实用户数据';
   }
   updateMode();
 })();
